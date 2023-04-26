@@ -1,90 +1,48 @@
 #include "main.h"
-#include <stdarg.h>
-#include <unistd.h>
 
 /**
- * _putchar - writes the character c to stdout
- * @c: The character to print
- *
- * Return: On success 1.
- * On error, -1 is returned, and errno is set appropriately.
- */
-int _putchar(char c)
-{
-	return (write(1, &c, 1));
-}
-
-/**
- * _printf - prints output according to a format
- * @format: character string containing format specifiers
- *
- * Return: number of characters printed (excluding null byte used to end output to strings)
+ * _printf - produces output according to a format
+ * @format: format string containing the characters and the specifiers
+ * Description: this function will call the get_print() function that will
+ * determine which printing function to call depending on the conversion
+ * specifiers contained into fmt
+ * Return: length of the formatted output string
  */
 int _printf(const char *format, ...)
 {
-	const char *str;
-	va_list arg;
-	int printed_chars = 0;
+int (*pfunc)(va_list, flags_t *);
+const char *p;
+va_list arguments;
+flags_t flags = {0, 0, 0};
 
-	va_start(arg, format);
+register int count = 0;
 
-	for (str = format; str && *str; str++)
-	{
-		if (*str != '%')
-		{
-			_putchar(*str);
-			printed_chars++;
-		}
-		else if (*str == '%' && *(str + 1) == '%')
-		{
-			_putchar('%');
-			printed_chars++;
-			str++;
-		}
-		else if (*str == '%' && *(str + 1) != '\0')
-		{
-			switch (*(str + 1))
-			{
-			case 'c':
-				_putchar(va_arg(arg, int));
-				printed_chars++;
-				break;
-			case 's':
-				printed_chars += print_string(va_arg(arg, char *));
-				break;
-			default:
-				_putchar(*str);
-				printed_chars++;
-				break;
-			}
-			str++;
-		}
-		else
-		{
-			_putchar(*str);
-			printed_chars++;
-		}
-	}
-	va_end(arg);
-
-	return (printed_chars);
-}
-
-/**
- * print_string - prints a string
- * @str: the string to print
- *
- * Return: the number of characters printed
- */
-int print_string(char *str)
+va_start(arguments, format);
+if (!format || (format[0] == '%' && !format[1]))
+return (-1);
+if (format[0] == '%' && format[1] == ' ' && !format[2])
+return (-1);
+for (p = format; *p; p++)
 {
-	int i;
-
-	if (str == NULL)
-		str = "(null)";
-
-	for (i = 0; str[i]; i++)
-		_putchar(str[i]);
-
-	return (i);
+if (*p == '%')
+{
+p++;
+if (*p == '%')
+{
+count += _putchar('%');
+continue;
+}
+while (get_flag(*p, &flags))
+p++;
+pfunc = get_print(*p);
+count += (pfunc)
+? pfunc(arguments, &flags)
+: _printf("%%%c", *p);
+}
+else
+count += _putchar(*p);
+}
+_putchar(-1);
+va_end(arguments);
+return (count);
 }
