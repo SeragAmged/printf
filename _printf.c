@@ -5,15 +5,16 @@
  * @format: Format string.
  *
  * Return: The number of characters printed (excluding the null byte used
- * to end output to strings),or -1 if there is an invalid conversion specifier.
+ * to end output to strings).
  */
-
 
 int _printf(const char *format, ...)
 {
 va_list args;
-va_start(args, format);
 int count = 0;
+
+va_start(args, format);
+
 while (*format != '\0')
 {
 if (*format == '%')
@@ -30,7 +31,7 @@ break;
 }
 case 's':
 {
-char *s = va_arg(args, char *);
+char *s = va_arg(args, char*);
 while (*s != '\0')
 {
 putchar(*s);
@@ -47,8 +48,7 @@ break;
 }
 default:
 {
-va_end(args);
-return -1;
+break;
 }
 }
 }
@@ -59,6 +59,7 @@ count++;
 }
 format++;
 }
+
 va_end(args);
 return count;
 }
