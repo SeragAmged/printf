@@ -1,66 +1,69 @@
 #include "main.h"
 
-void print_buffer(char buffer[], int *buff_ind);
-
 /**
- * _printf - Printf function
- * @format: format.
- * Return: Printed chars.
+ * _printf - Prints output to stdout according to a format.
+ * @format: Format string.
+ *
+ * Return: The number of characters printed (excluding the null byte used
+ * to end output to strings), or -1 if there is an invalid conversion specifier.
+ * 
  */
 int _printf(const char *format, ...)
 {
-int i, printed = 0, printed_chars = 0;
-int flags, width, precision, size, buff_ind = 0;
-va_list list;
-char buffer[BUFF_SIZE];
+va_list args;
+int count = 0;
 
-if (format == NULL)
-return (-1);
+va_start(args, format);
 
-va_start(list, format);
-
-for (i = 0; format && format[i] != '\0'; i++)
+while (*format != '\0')
 {
-if (format[i] != '%')
+if (*format == '%')
 {
-buffer[buff_ind++] = format[i];
-if (buff_ind == BUFF_SIZE)
-print_buffer(buffer, &buff_ind);
-/* write(1, &format[i], 1);*/
-printed_chars++;
+format++;
+int left_justify = 0;
+int pad_zero = 0;
+int width = 0;
+while (1)
+{
+if (*format == '-')
+{
+left_justify = 1;
+}
+else if (*format == '0')
+{
+pad_zero = 1;
+}
+else if (*format >= '1' && *format <= '9')
+{
+width = width * 10 + (*format - '0');
 }
 else
 {
-print_buffer(buffer, &buff_ind);
-flags = get_flags(format, &i);
-width = get_width(format, &i, list);
-precision = get_precision(format, &i, list);
-size = get_size(format, &i);
-++i;
-printed = handle_print(format, &i, list, buffer,
-flags, width, precision, size);
-if (printed == -1)
-return (-1);
-printed_chars += printed;
+break;
 }
+format++;
 }
 
-print_buffer(buffer, &buff_ind);
-
-va_end(list);
-
-return (printed_chars);
-}
-
-/**
- * print_buffer - Prints the contents of the buffer if it exist
- * @buffer: Array of chars
- * @buff_ind: Index at which to add next char, represents the length.
- */
-void print_buffer(char buffer[], int *buff_ind)
+switch (*format)
 {
-if (*buff_ind > 0)
-write(1, &buffer[0], *buff_ind);
-
-*buff_ind = 0;
+case 'c':
+{
+int c = va_arg(args, int);
+if (left_justify)
+{
+putchar(c);
+count++;
+for (int i = 0; i < width - 1; i++)
+{
+putchar(' ');
+count++;
 }
+}
+else
+{
+for (int i = 0; i < width - 1; i++)
+{
+putchar(' ');
+count++;
+}
+putchar(c);
