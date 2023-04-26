@@ -1,54 +1,54 @@
 #include "main.h"
-
 /**
-* _printf - Prints output to stdout according to a format.
-* @format: Format string.
-*
-* Return: The number of characters printed (excluding the null byte used
-* to end output to strings).
-*/
-int _printf(const char *format, ...)
+ * _printf - Produces output according to a format
+ * @format: A character string containing zero or more directives
+ *
+ * Return: The number of characters printed (excluding the null byte used to
+ *         end output to strings), or -1 on failure
+ */
+
+int _printf(const charformat, ...)
 {
-va_list args;
 int count = 0;
+va_list args;
+char c, s;
 
 va_start(args, format);
 
-while (*format != '\0')
+while (format)
 {
-if (*format == '%')
+if (format == '%')
 {
 format++;
-switch (*format)
+
+switch (format)
 {
 case 'c':
-{
-int c = va_arg(args, int);
+c = (char) va_arg(args, int);
 putchar(c);
 count++;
 break;
-}
+
 case 's':
+s = va_arg(args, char );
+while (s)
 {
-char *s = va_arg(args, char*);
-while (*s != '\0')
-{
-putchar(*s);
+putchar(s);
 s++;
 count++;
 }
 break;
-}
+
 case '%':
-{
 putchar('%');
 count++;
 break;
-}
+
 default:
-{
+putchar('%');
+putchar(format);
+count += 2;
 break;
-}
 }
 }
 else
@@ -56,9 +56,11 @@ else
 putchar(*format);
 count++;
 }
+
 format++;
 }
 
 va_end(args);
-return (count);
+
+return count;
 }
