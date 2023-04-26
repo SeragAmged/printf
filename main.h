@@ -1,30 +1,30 @@
-#ifndef MAINH
-#define MAINH
+#ifndef MAIN_H
+#define MAIN_H
 
 #include <stdarg.h>
-int _putchar(char c);
-int _printf(const char *format, ...);
-int print_char(va_list c);
-int print_string(va_list s);
-int print_int(va_list i);
-int print_dec(va_list d);
-int print_rev(va_list r);
-int print_bin(va_list b);
-int print_unsig(va_list u);
-int print_octal(va_list o);
-int print_x(va_list x);
-int print_X(va_list X);
-int print_rot13(va_list R);
-/**
-  * struct code_format - Struct format
-  *
-  * @sc: The specifiers
-  * @f: The function associated
-  */
-typedef struct code_format
-{
-	char *sc;
-	int (*f)(va_list);
-} code_f;
+#include <stdlib.h>
 
+/**
+ * struct print - struct containing chrs for comparison with specfiers and
+ * selecting appropriate function
+ * @type: char to compare
+ * @funct: function to print
+ *
+ */
+
+typedef struct print
+{
+	char type;
+	int (*funct)(va_list);
+
+} print_f;
+
+int _printf(const char *format, ...);
+int _putchar(char c);
+int printNaN(char c1, char c2);
+
+int printchar(va_list a_list);
+int printstr(va_list a_list);
+int printint(va_list a_list);
+int (*_printfunc(char fi))(va_list);
 #endif
