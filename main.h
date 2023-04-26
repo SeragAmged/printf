@@ -1,30 +1,10 @@
-#ifndef MAIN_H
-#define MAIN_H
-
-#include <stdarg.h>
-#include <stdlib.h>
-
-/**
- * struct print - struct containing chrs for comparison with specfiers and
- * selecting appropriate function
- * @type: char to compare
- * @funct: function to print
- *
- */
-
-typedef struct print
-{
-	char type;
-	int (*funct)(va_list);
-
-} print_f;
+#ifndef __MAIN_H__
+#define __MAIN_H__
 
 int _printf(const char *format, ...);
-int _putchar(char c);
-int printNaN(char c1, char c2);
+int _putchar(int c);
+char *convert(unsigned int num, int base);
+void decimal_helper(int d, int *len);
 
-int printchar(va_list a_list);
-int printstr(va_list a_list);
-int printint(va_list a_list);
-int (*_printfunc(char fi))(va_list);
+void helper(const char *s, int *len);
 #endif

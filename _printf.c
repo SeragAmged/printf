@@ -1,72 +1,110 @@
 #include "main.h"
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdarg.h>
+#include <stdlib.h>
 
 /**
- * _printfunc - get the right function corresponding to format specified
- * @fi: input format
- * Return:pointer to function that corresponds with specified format
- *
- */
-int (*_printfunc(char fi))(va_list)
+  * convert - converts to string
+  * @num: number to convert
+  * @base: base to conver to
+  * Return: char pointer
+  */
+char *convert(unsigned int num, int base)
 {
-	int i = 0;
-	print_f f[] = {
-		{'c', printchar},
-		{'s', printstr},
-		{'d', printint},
-		{'i', printint},
-		{'\0', NULL}
-	};
-	while (f[i].type)
-	{
-		if (fi == f[i].type)
-		{
-			return (f[i].funct);
-		}
-		i++;
+	static const char Representation[] = "0123456789ABCDEF";
+	static char buffer[50];
+	char *ptr;
 
-	}
-	return (NULL);
+	ptr = &buffer[49];
+	*ptr = '\0';
+
+	do {
+		*--ptr = Representation[num % base];
+		num /= base;
+	} while (num != 0);
+	return (ptr);
 }
 
 /**
- * _printf - function that produces output according to format passed
- * @format: character string containing 0 or more directive
- * Return: number of chars printed exluding null byte
- */
-int _printf(const char *format, ...)
+  * decimal_helper - helper founct for decimal writ
+  * @d: signed int
+  * @len: lenght
+  */
+void decimal_helper(int d, int *len)
 {
-	int i, counter;
+	char *s, c = '-';
 
-	int (*fn)(va_list);
+	int size;
 
-	va_list a_list;
-
-	if (format == NULL)
-		return (-1);
-
-	va_start(a_list, format);
-	i = counter = 0;
-
-	while (format[i] != '\0')
+	if (d < 0)
 	{
-		if (format[i] == '%')
-		{
-			if (format[i + 1] == '\0')
-				return (-1);
-			fn = _printfunc(format[i + 1]);
-			if (fn == NULL)
-				counter += printNaN(format[i], format[i + 1]);
-			else
-				counter += fn(a_list);
-			i++;
-		}
-		else
-		{
-			_putchar(format[i]);
-			counter++;
-		}
-		i++;
+		d *= -1;
+		write(1, &c, 1);
 	}
-	va_end(a_list);
-	return (counter);
+	s = convert(d, 10);
+	size = strlen(s);
+	write(1, s, size);
+	*len += size;
+}
+/**
+  * helper - helper function to reduce lines
+  * @s: string
+  * @len: lenght
+  */
+
+void helper(const char *s, int *len)
+{
+	write(1, s, strlen(s));
+	*len += strlen(s);
+}
+/**
+  * _printf - my own printf function
+  * @fmt: format string
+  * @...: multiple args
+  * Return: number of char printed, except /0
+  */
+int _printf(const char *fmt, ...)
+{
+	const char *temp, c = '%';
+
+	int i, len = 0;
+
+	va_list ap;
+
+	va_start(ap, fmt);
+	for (temp = fmt; *temp != '\0'; temp++)
+	{
+		len++;
+		if (*temp == '%')
+		{
+			temp++;
+			switch (*temp)
+			{
+				case 'c':
+					i = va_arg(ap, int);
+					write(1, &i, 1);
+					len++;
+					break;
+				case 's':
+					helper(va_arg(ap, char *), &len);
+					break;
+				case 'i':
+					helper(convert(va_arg(ap, int), 10), &len);
+					break;
+				case 'd':
+					decimal_helper(va_arg(ap, int), &len);
+					break;
+				default:
+					write(1, &c, 1);
+					write(1, temp, 1);
+					break;
+			}
+			temp++;
+		}
+		write(1, temp, 1);
+	}
+	va_end(ap);
+	return (len);
 }
